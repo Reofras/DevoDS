@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de XML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="email"], input[type="password"], input[type="file"] {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #09f;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .progress {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enviar Arquivos XML</h1>
+    <form id="emailForm">
+        <label for="email">E-mail do Gmail:</label>
+        <input type="email" id="email" name="email" placeholder="Seu e-mail" required>
+
+        <label for="appPassword">Senha de Aplicativo do Gmail:</label>
+        <input type="password" id="appPassword" name="appPassword" placeholder="Sua senha de aplicativo" required>
+
+        <label for="recipientEmail">E-mail do Destinatário:</label>
+        <input type="email" id="recipientEmail" name="recipientEmail" placeholder="E-mail do destinatário" required>
+
+        <button type="submit">Salvar Credenciais</button>
+    </form>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="xmlFiles">Selecione os arquivos XML:</label>
+        <input type="file" id="xmlFiles" name="xmlFiles" accept=".xml" multiple required>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <div class="spinner" id="spinner"></div>
+
+    <div class="progress" id="progress"></div>
+
+    <h2>Resultado</h2>
+    <pre id="result"></pre>
+
+    <script>
+        let email = '';
+        let appPassword = '';
+        let recipientEmail = '';
+
+        // Formulário para salvar e-mail, senha de aplicativo e e-mail do destinatário
+        document.getElementById('emailForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            email = document.getElementById('email').value;
+            appPassword = document.getElementById('appPassword').value;
+            recipientEmail = document.getElementById('recipientEmail').value;
+            alert('Credenciais salvas com sucesso!');
+        });
+
+        // Formulário para enviar os XMLs
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('xmlFiles');
+            const files = fileInput.files;
+
+            // Verifica se os arquivos foram selecionados
+            if (files.length === 0) {
+                alert("Por favor, selecione pelo menos um arquivo XML.");
+                return;
+            }
+
+            // Verifica se as credenciais foram fornecidas
+            if (!email || !appPassword || !recipientEmail) {
+                alert("Por favor, insira o e-mail, a senha de aplicativo e o e-mail do destinatário.");
+                return;
+            }
+
+            // Mostrar o spinner
+            document.getElementById('spinner').style.display = 'block';
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('xmlFiles', files[i]);
+            }
+            formData.append('email', email);
+            formData.append('appPassword', appPassword);
+            formData.append('recipientEmail', recipientEmail);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').textContent = `Erro: ${data.error}`;
+                } else {
+                    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+                    alert("Arquivos processados, planilha atualizada e e-mail enviado.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao enviar arquivos:", error);
+                document.getElementById('result').textContent = "Erro ao enviar os arquivos.";
+            })
+            .finally(() => {
+                // Ocultar o spinner
+                document.getElementById('spinner').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
