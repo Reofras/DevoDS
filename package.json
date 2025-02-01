@@ -1,0 +1,28 @@
+{
+  "name": "escriptas",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000D\u0000e\u0000v\u0000o\u0000D\u0000S\u0000\r\u0000 \u0000",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Reofras/DevoDS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Reofras/DevoDS/issues"
+  },
+  "homepage": "https://github.com/Reofras/DevoDS#readme",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.10.0",
+    "xml2js": "^0.6.2"
+  }
+}
